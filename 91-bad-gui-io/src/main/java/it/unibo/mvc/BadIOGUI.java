@@ -10,12 +10,12 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -43,7 +43,6 @@ public class BadIOGUI {
         final JPanel canvas = new JPanel();
         canvas.setLayout(new BorderLayout());
         final JButton write = new JButton("Write on file");
-        canvas.add(write, BorderLayout.CENTER);
         frame.setContentPane(canvas);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         /*
@@ -67,6 +66,27 @@ public class BadIOGUI {
                 }
             }
         });
+        /*
+         * New Implementations
+         */
+        final JPanel canvas2 = new JPanel();
+        canvas2.setLayout(new BoxLayout(canvas2, BoxLayout.X_AXIS));
+        canvas2.add(write);
+        canvas.add(canvas2, BorderLayout.CENTER);
+        final JButton read = new JButton("Read&Print");
+        canvas2.add(read);
+        read.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try (final var br = new BufferedReader(new FileReader(PATH))) {
+                    System.err.println(br.readLine());
+                } catch (final IOException exc) {
+                    JOptionPane.showMessageDialog(frame, exc, "Error", JOptionPane.ERROR_MESSAGE);
+                    exc.printStackTrace(); // NOPMD: allowed as this is just an exercise
+                }
+            }
+        });
+
     }
 
     private void display() {
@@ -88,6 +108,10 @@ public class BadIOGUI {
          * on screen. Results may vary, but it is generally the best choice.
          */
         frame.setLocationByPlatform(true);
+        /*
+         * Resize the frame to the minimum size prior to displaying
+         */
+        frame.pack();
         /*
          * OK, ready to push the frame onscreen
          */
